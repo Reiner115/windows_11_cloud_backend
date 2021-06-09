@@ -21,10 +21,10 @@ var KEY = "MYKEY";
 
 
 
-//app.use("/public/",express.static('public'))
+app.use("/public/",express.static('public'))
 
 
-
+/*
 
 //used before for serving static routes
 app.get("/public/images/:imageName" ,async function(req , res){
@@ -45,9 +45,10 @@ app.get("/public/images/:imageName" ,async function(req , res){
 		res.status( 404 ).send('Not found');	
 });
 
+*/
 
-
-app.use( "/" , require("./routes") );
+app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
+// app.use( "/" , require("./routes") );
 
 
 	app.listen(port , ()=>{ console.log('listining at port  ' + port ); });
