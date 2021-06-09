@@ -47,8 +47,8 @@ app.get("/public/images/:imageName" ,async function(req , res){
 
 */
 
-app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
-// app.use( "/" , require("./routes") );
+//app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
+app.use( "/" , require("./routes") );
 
 
-	app.listen(process.env.PORT || 3000 , ()=>{ console.log('listining at port  ' + port ); });
+	app.listen( process.env.PORT || port , ()=>{ console.log('listining at port  ' +( process.env.PORT || port ) ); });
