@@ -47,10 +47,12 @@ app.use("/" , function(req , res , next ){
 	
 });
 */
+
 app.use( "/meals/favs/" , require("./favs") );
 app.use( "/meals" , require("./meals.js") );
 app.use( "/categories" , require("./categories.js") );
 app.use( "/orders" , require("./orders") );
+app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
 app.use(myLogger)
 
 module.exports = app;
