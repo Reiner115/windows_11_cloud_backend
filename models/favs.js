@@ -1,0 +1,53 @@
+const con = require("../db/connection");
+
+function insertFav( userId , mealId ){
+	return new Promise( function( resolve , reject ){
+		con.query( "INSERT INTO `favs`(`mealId`, `userId`, `createdAt`, `updatedAt`) VALUES ( ? , ? , CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )" ,
+		[ mealId , userId ] ,
+		function( err , result ){
+			if( err ){
+				err.statusCode = 500;
+				err.message = "could not insert into fav";
+				reject( err );
+			}
+			resolve( result );
+		}
+		);
+	});
+}
+
+function deleteFav( userId , mealId ){
+	return new Promise( function( resolve , reject ){
+		con.query( "DELETE FROM `favs` WHERE mealId = ? AND userId = ?" ,
+		[ mealId , userId ] ,
+		function( err , result ){
+			if( err ){
+				err.statusCode = 500;
+				err.message = "could not insert into fav";
+				reject( err );
+			}
+			resolve( result );
+		}
+		);
+	});
+}
+
+function getFavs( userId ){
+	return new Promise( function( resolve , reject ){
+		con.query( "select * from favs join meals on meals.id = favs.mealId where favs.userId = ? " ,
+		 userId  ,
+		function( err , result ){
+			if( err ){
+				err.statusCode = 500;
+				err.message = "could not get  favs meals";
+				reject( err );
+			}
+			resolve( result );
+		}
+		);
+	});
+}
+
+module.exports={
+	insertFav , deleteFav , getFavs
+}
