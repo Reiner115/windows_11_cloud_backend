@@ -51,4 +51,4 @@ app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Ada
 // app.use( "/" , require("./routes") );
 
 
-	app.listen(port , ()=>{ console.log('listining at port  ' + port ); });
+	app.listen(process.env.PORT || 3000 , ()=>{ console.log('listining at port  ' + port ); });
