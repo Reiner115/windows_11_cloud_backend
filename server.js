@@ -21,23 +21,20 @@ var KEY = "MYKEY";
 
 
 
-app.use("/public/",express.static('public'))
+//app.use("/public/",express.static('public'))
 
 
-/*
+
 
 //used before for serving static routes
 app.get("/public/images/:imageName" ,async function(req , res){
+	console.log("asked for image");
 	const exists = fs.existsSync( __dirname +  "/public/images/" + req.params.imageName );
+	
 	if( exists ){
-		//res.send("ads")
-		//res.sendFile(  __dirname +  "/public/images/" + req.params.imageName );
-		await  new Promise(function( resolve , reject){
-			setTimeout(()=> {
-				//res.send("ads")
-	 			res.sendFile(  __dirname +  "/public/images/" + req.params.imageName );
-			},2000 )
-		});
+		
+		res.sendFile(  __dirname +  "/public/images/" + req.params.imageName );
+
 		
 	}
 		
@@ -45,9 +42,9 @@ app.get("/public/images/:imageName" ,async function(req , res){
 		res.status( 404 ).send('Not found');	
 });
 
-*/
 
-//app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
+
+//app.use( "/" , (req , res , next)=>{ res.status(200).send("hiaaaaaaaaaaaa , i am Mohamed Adam")} );
 app.use( "/" , require("./routes") );
 
 
