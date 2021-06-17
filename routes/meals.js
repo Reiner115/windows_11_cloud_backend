@@ -5,6 +5,9 @@ router.get("/categories/:id" ,  function(req , res , next ){
 	
 	var offset = req.query.offset;
 	var limit = req.query.limit;
+	var categoryId = req.params.id;
+
+	categoryId
 
 	if(  offset == undefined )
 	offset = 0
@@ -12,14 +15,18 @@ router.get("/categories/:id" ,  function(req , res , next ){
 	if( limit == undefined)
 		limit = 5;
 
-	offset = parseInt( offset );
-	limit = parseInt( limit );	
+
 	console.log( ` offset  : ${offset} , limit : ${limit} `);
-	var categoryId = req.params.id;
-	if( categoryId == null || categoryId == undefined ||  isNaN(categoryId)  ){
+
+	if( categoryId == undefined || categoryId == undefined ||  isNaN(categoryId)  ){
 		res.status( 400 ).send("categoryId value is not present");
 		return;
 	}
+
+	offset = parseInt( offset );
+	limit = parseInt( limit );	
+	categoryId = parseInt( categoryId );
+
 	Meal.getMealsByCategory( categoryId , offset , limit ).
 	then( data =>{
 		res.send( data );
@@ -39,6 +46,7 @@ router.get("/offer" , ( req , res)=>{
 */
 router.get("/offers/" , ( req , res , next )=>{
 
+	console.log("i am at the offers route");
 	var offset = req.query.offset;
 	var limit = req.query.limit;
 
@@ -114,6 +122,10 @@ router.get("/:mealId" , function( req , res , next){
 	
 	if(  mealId == undefined ){
 		res.status( 400 ).send(" mealid not found");
+		return;
+	}
+	if( isNaN(mealId) ){
+		res.status( 400 ).send(" mealid must be a number");
 		return;
 	}
 	var userId = req.user.id;

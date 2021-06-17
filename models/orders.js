@@ -3,8 +3,13 @@ const connection = require("../db/connection");
 async function getOrderById( userId , orderId  ){
 	return new Promise(
 		function( resolve , reject ){
-			
-			connection.query( `select * from orders where id = ? and userId = ? limit 1` , [orderId , userId] , function( err  ,  orderData ){
+			console.log(`user id is ${userId} order id is ${orderId}`);
+			connection.query(
+				 "SELECT status , paidPrice  , orders.createdAt , orders.updatedAt ,"+
+				 " SUM(meal_order.quantity * meal_order.price ) as totalPrice FROM orders"+
+			" JOIN meal_order on orders.id = meal_order.orderId WHERE userId = ? and orders.id = ? limit 1"
+			 , [ userId , orderId  ] ,
+			  function( err  ,  orderData ){
 				if( err ){
 					err.statusCode = 500;
 					err.msg = "colud not get order from db"
@@ -12,13 +17,15 @@ async function getOrderById( userId , orderId  ){
 					return;
 				}else{
 					var myOrder = orderData[0];
+					console.log( myOrder );
 					if( myOrder == undefined ){
 						console.log("instance of aaaaaaaaaaaaaaaaaaaa");
 						resolve( orderData );
 						return;
 					}
-					connection.query("select * from meals JOIN meal_order on meals.id = meal_order.mealId where meal_order.orderId = ?",
-					myOrder.id,
+					connection.query(
+						"SELECT meals.id, meals.name , meals.desc , meals.picture, meal_order.price , meals.rate, meals.offer, meal_order.quantity , meal_order.createdAt , meal_order.updatedAt FROM meals JOIN meal_order on meals.id = meal_order.mealId where meal_order.orderId = ?",
+					orderId,
 					function( err , meals ){
 						if( err ){
 							err.statusCode = 500;
@@ -36,10 +43,13 @@ async function getOrderById( userId , orderId  ){
 
 
 
-async function getOrders( userId ){
+async function getOrders( userId , offset , limit  ){
+
 	return new Promise(
 		function( resolve , reject ){
-			connection.query("select * from orders where userId = ? " , userId , function( err , data ){
+			connection.query("select orders.id , orders.status , orders.paidPrice , orders.createdAt , orders.updatedAt  , SUM( meal_order.quantity * meal_order.price ) as totalPrice from orders join meal_order on orders.id = meal_order.orderId where userId = ?  GROUP BY orders.id  ORDER BY orders.createdAt DESC limit ? , ? " , 
+			[ userId , offset , limit ] ,
+			 function( err , data ){
 				if( err ){
 					err.statusCode = 500;
 					err.msg = "could not get orders";
@@ -70,11 +80,11 @@ async function insertOrder( order ){
 				 
 				var preaparedOrderArray = [];
 				preaparedOrderArray.push( order.userId );
-				preaparedOrderArray.push( order.totalPrice );
 				preaparedOrderArray.push( order.paidPrice );
-				preaparedOrderArray.push( order.delivered );
-				connection.query("INSERT INTO `orders`(`id`, `userId`, `totalPrice`, `paidPrice`, `delivered`, `createdAt`, `updatedAt`)"+
-				" VALUES (NULL ,? , ? , ? , ? ,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)",  
+				
+				connection.query("INSERT INTO `orders`"+
+				"(`id`, `userId` , `paidPrice`, `status`, `createdAt`, `updatedAt`)"+
+				" VALUES ( NULL , ? , ?  , 1 , CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )",  
 				preaparedOrderArray ,
 				async function(err, result) {
 					
@@ -130,12 +140,14 @@ async function insertOrder( order ){
 function peapareMealsQuery(  orderId ,  meals ){
 	
 	var ids = []; 
-	var sql = "INSERT INTO meal_order(mealId, orderId, createdAt, updatedAt) VALUES  ";
+	var sql = "INSERT INTO `meal_order`(`mealId`, `orderId`, `quantity`, `price`, `createdAt`, `updatedAt`) VALUES ";
 	for( var i = 0 ; i<meals.length ; i++ ){
 		ids.push( meals[i].id );
 		ids.push( orderId );
+		ids.push( meals[i].quantity );
+		ids.push( meals[i].price );
 		
-		sql = sql + `( ? , ? ,CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )`;
+		sql = sql + `( ? , ? , ? , ? ,CURRENT_TIMESTAMP , CURRENT_TIMESTAMP )`;
 		if( i != (meals.length-1) ){
 			sql = sql +" , ";
 		}
@@ -152,11 +164,6 @@ function validateOrder( order ){
 	
 	if( isNaN( order.userId ) || order.userId == undefined || order.userId == null  )
 	return "wrong user id";
-	if( isNaN( order.totalPrice ) || order.totalPrice == undefined || order.totalPrice == null  )
-	return "totlal price value is not found in the request";
-	if( isNaN( order.delivered ) || order.delivered == undefined || order.delivered == null  )
-	return "delivered value is not found in the request"
-
 	if( order.meals == undefined  )
 	return "order meals value not found in the request"
 	if( !(order.meals instanceof Array )  )

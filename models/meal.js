@@ -3,7 +3,7 @@ var connection = require("../db/connection.js");
 
 function getMealsByCategory( catId , offset , limit ){
 	return new Promise( function( resolve , reject ){
-		connection.query( "select * from meals where categoryId = ? limit ? , ? " , [catId , offset , limit] , function( err , data ){
+		connection.query( "select meals.id,  meals.name ,  meals.desc ,  meals.picture ,  meals.price ,  meals.rate ,  meals.offer ,  meals.categoryId ,  meals.createdAt ,  meals.updatedAt , favs.mealId as favs from meals left join favs on meals.id = favs.mealId where categoryId = ? limit ? , ? " , [catId , offset , limit] , function( err , data ){
 			if( err ){
 				err.msg = "could not  get meals by category";
 				err.statusCode = 500;
@@ -16,7 +16,7 @@ function getMealsByCategory( catId , offset , limit ){
 }
 
 function getOffersByLimits( offset , limit ){
-	var sql = "SELECT * FROM meals WHERE offer limit ? , ? "
+	var sql = "SELECT * , favs.mealId as favs FROM meals left join favs on meals.id = favs.mealId WHERE offer limit ? , ? "
 
 	
 	return new Promise( function( resolve , reject ){
@@ -101,7 +101,7 @@ async function getMealById( userId , mealId ){
 function getMeals( offset , limit ){
 	return new Promise(
 		function( resolve , reject ){
-			connection.query("SELECT * FROM meals LIMIT ? , ?" , [ offset , limit ] , function( err , data ){
+			connection.query("SELECT `id`, `name`, `desc`, `picture`, `price`, `rate`, `offer`, `categoryId` , favs.userId as favs FROM `meals` LEFT JOIN favs on meals.id = favs.mealId limit ? , ?" , [ offset , limit ] , function( err , data ){
 				if( err ){
 					err.statusCode = 500;
 					err.msg = "error getting meals";

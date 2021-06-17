@@ -32,10 +32,10 @@ function deleteFav( userId , mealId ){
 	});
 }
 
-function getFavs( userId ){
+function getFavs( userId , offset , limit ){
 	return new Promise( function( resolve , reject ){
-		con.query( "select * from favs join meals on meals.id = favs.mealId where favs.userId = ? " ,
-		 userId  ,
+		con.query( "select * , favs.mealId as favs from favs join meals on meals.id = favs.mealId where favs.userId = ? limit ? , ? " ,
+		 [userId  , offset , limit ] ,
 		function( err , result ){
 			if( err ){
 				err.statusCode = 500;

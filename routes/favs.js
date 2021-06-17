@@ -3,8 +3,21 @@ const Favs = require("../models/favs");
 
 
 router.get("/" , function( req , res , next ){
+
+	var offset = req.query.offset;
+	var limit = req.query.limit;
+	if( offset == undefined )
+	offset = 0;
+	if( limit == undefined )
+	limit = 5;
+	offset = parseInt(offset);
+	limit = parseInt(limit);
+	if( offset == undefined || limit == undefined ){
+		offset = 0;
+		limit = 5;
+	}
 	var userId = req.user.id;
-	Favs.getFavs( userId )
+	Favs.getFavs( userId , offset , limit )
 	.then( result =>{
 		res.send( result );
 	})
@@ -13,6 +26,7 @@ router.get("/" , function( req , res , next ){
 });
 
 router.delete("/:mealId" , function( req , res , next ){
+	console.log("aaaaaaaaaaaaaaaaaaaaaa");
 	var userId = req.user.id;
 	var mealId = req.params.mealId;
 	if( mealId == undefined ){
@@ -37,6 +51,7 @@ router.delete("/:mealId" , function( req , res , next ){
 });
 
 router.post("/" , function( req , res , next ){
+	console.log("i am at the fav screen");
 	var userId = req.user.id;
 	var mealId = req.body.mealId;
 	if( mealId == undefined ){

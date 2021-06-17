@@ -3,7 +3,7 @@ var app = express();
 const auth = require("../Authentication/auth")
 
 var myLogger = function (err , req, res, next) {
-	
+		
 		console.log(" code : " + err.statusCode);
 		console.log( " msg : " + err.mesg);
 		console.log( "message : " + err.message);
@@ -17,7 +17,7 @@ var myLogger = function (err , req, res, next) {
 
 app.use( "/users" , require("./user.js") );
 
-/*
+
 app.use("/" , function(req , res , next ){
 	var authorization = req.headers.authorization;
 	if( authorization == undefined ){
@@ -46,9 +46,9 @@ app.use("/" , function(req , res , next ){
 
 	
 });
-*/
 
-app.use( "/meals/favs/" , require("./favs") );
+
+app.use( "/meals/favs" , require("./favs") );
 app.use( "/meals" , require("./meals.js") );
 app.use( "/categories" , require("./categories.js") );
 app.use( "/orders" , require("./orders") );
