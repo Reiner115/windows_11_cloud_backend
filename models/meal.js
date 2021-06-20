@@ -1,9 +1,10 @@
 const e = require("express");
 var connection = require("../db/connection.js");
 
-function getMealsByCategory( catId , offset , limit ){
+function getMealsByCategory( userId , catId , offset , limit ){
 	return new Promise( function( resolve , reject ){
-		connection.query( "select meals.id,  meals.name ,  meals.desc ,  meals.picture ,  meals.price ,  meals.rate ,  meals.offer ,  meals.categoryId ,  meals.createdAt ,  meals.updatedAt , favs.mealId as favs from meals left join favs on meals.id = favs.mealId where categoryId = ? limit ? , ? " , [catId , offset , limit] , function( err , data ){
+		connection.query( "select meals.id,  meals.name ,  meals.desc ,  meals.picture ,  meals.price ,  meals.rate ,  meals.offer ,  meals.categoryId ,  meals.createdAt ,  meals.updatedAt ,   ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs from meals left join favs on meals.id = favs.mealId where categoryId = ? GROUP BY meals.id ORDER BY meals.id limit ? , ? " ,
+		 [ userId , catId , offset , limit] , function( err , data ){
 			if( err ){
 				err.msg = "could not  get meals by category";
 				err.statusCode = 500;
@@ -15,18 +16,20 @@ function getMealsByCategory( catId , offset , limit ){
 	});
 }
 
-function getOffersByLimits( offset , limit ){
-	var sql = "SELECT * , favs.mealId as favs FROM meals left join favs on meals.id = favs.mealId WHERE offer limit ? , ? "
+function getOffersByLimits( userId , offset , limit ){
+	console.log(`userid ${userId} offset ${offset} limit ${limit}`);
+	var sql = "SELECT * ,   ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs  FROM meals left join favs on meals.id = favs.mealId WHERE offer GROUP BY meals.id ORDER BY meals.id limit ? , ? "
 
 	
 	return new Promise( function( resolve , reject ){
-		connection.query( sql ,  [offset , limit ] , function( err , data ){
+		connection.query( sql ,  [ userId , offset , limit ] , function( err , data ){
 			console.log( data);
 			if( err ){
 				err.msg = "could not get offers by limit";
 				err.statusCode = 500;
 				reject( err );
 			}else{
+
 				resolve( data );
 			}
 		});
@@ -98,10 +101,10 @@ async function getMealById( userId , mealId ){
 }
 
 
-function getMeals( offset , limit ){
+function getMeals( userId , offset , limit ){
 	return new Promise(
 		function( resolve , reject ){
-			connection.query("SELECT `id`, `name`, `desc`, `picture`, `price`, `rate`, `offer`, `categoryId` , favs.userId as favs FROM `meals` LEFT JOIN favs on meals.id = favs.mealId limit ? , ?" , [ offset , limit ] , function( err , data ){
+			connection.query("SELECT `id`, `name`, `desc`, `picture`, `price`, `rate`, `offer`, `categoryId` , ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs FROM `meals` LEFT JOIN favs on meals.id = favs.mealId GROUP BY meals.id ORDER BY meals.id limit ? , ?" , [ userId , offset , limit ] , function( err , data ){
 				if( err ){
 					err.statusCode = 500;
 					err.msg = "error getting meals";

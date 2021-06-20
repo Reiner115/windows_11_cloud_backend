@@ -34,14 +34,17 @@ function deleteFav( userId , mealId ){
 
 function getFavs( userId , offset , limit ){
 	return new Promise( function( resolve , reject ){
-		con.query( "select * , favs.mealId as favs from favs join meals on meals.id = favs.mealId where favs.userId = ? limit ? , ? " ,
-		 [userId  , offset , limit ] ,
+		console.log(`the user id is : ${userId}`);
+		con.query( "select * ,  ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs from favs join meals on meals.id = favs.mealId where favs.userId = ? limit ? , ? " ,
+		 [userId , userId  , offset , limit ] ,
 		function( err , result ){
 			if( err ){
 				err.statusCode = 500;
 				err.message = "could not get  favs meals";
 				reject( err );
 			}
+			console.log("getfavs");
+			console.log( result );
 			resolve( result );
 		}
 		);

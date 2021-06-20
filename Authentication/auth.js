@@ -3,16 +3,18 @@ var crypto = require('crypto');
 const bcrypt = require("bcrypt");
 
 const SECRET = "mysecret";
-const salt = "MohamedAdam";
+
 function signIn( user ){
 
-	var token = jwt.sign( user , SECRET  , {algorithm: 'HS256' });
+	var token = jwt.sign( user , SECRET  , {algorithm: 'HS256' , expiresIn :  60 *60 });
+
 	return token;
 }
 
 function verifyUser( token  ){
 	try{
-		return jwt.verify( token , SECRET , {algorithm: 'HS256'} );
+		var result =  jwt.verify( token , SECRET , {algorithm: 'HS256'} );
+		return result;
 	}catch( err ){
 		err.code = 401;
 		err.msg = "cloud not verify user token"

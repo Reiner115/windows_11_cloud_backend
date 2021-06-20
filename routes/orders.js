@@ -43,7 +43,7 @@ router.get("/" , ( req , res , next )=>{
 	
 	if( limit == undefined)
 		limit = 5;
-	
+	console.log( req.user );
 	var userId = req.user.id;
 
 	Order.getOrders( userId , offset , limit )

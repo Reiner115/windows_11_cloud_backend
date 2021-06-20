@@ -72,6 +72,24 @@ async function insertUser( user  ){
 }
 
 
+async function checkEmail( email ){
+	return new Promise(function(resolve , reject ){
+
+	
+		connection.query("select * from users where email = ? " , [email] , ( err , data )=>{
+			if( err ){
+				console.log(err);	
+				var err = Error("error when trying to checkemail") ;
+				err.statusCode = 500;
+				reject( err )
+			}else{
+				resolve(data);
+			}
+		});
+	});
+}
+
+
 
 
 
@@ -82,7 +100,8 @@ module.exports = {
 	getUsers ,
 	getUserById ,
 	isValidUser ,
-	getUserByEmail
+	getUserByEmail, 
+	checkEmail
 }
 
 
@@ -91,7 +110,7 @@ function isValidEmail( email ){
 	return regex.test( email ) ?  null :  "email is not valid";
 }
 function isValidName( name ){
-	var regex = /\b([A-ZÀ-ÿ][-,a-z. ']+[ ]*)+/gm;
+	var regex = /\b([a-zA-Z0-9]{3,30})+/gm;
 	return regex.test( name ) ?  null :  "the user name is not valid";
 }
 function isValidpassword( password ){
@@ -103,17 +122,19 @@ function isMatchingPasswords( password , repeatedPassword ){
 }
 
 function isValidUser(  user ){
+
 	if( isValidName( user.name ) != null ){
 		return isValidName( isValidName( user.name ) );
 	}
 	if( isValidEmail( user.email ) != null ){
+		
 		return isValidEmail( user.email );
 	}
 	if( isValidpassword( user.password ) != null ){
 		return isValidpassword( user.password );
 	}
-	if( isMatchingPasswords( user.password , user.repeatedPassword ) != null ){
-		return isMatchingPasswords( user.password , user.repeatedPassword );
+	if( isMatchingPasswords( user.password , user.confirmationPassword ) != null ){
+		return isMatchingPasswords( user.password , user.confirmationPassword );
 	}
 	return true;
 }

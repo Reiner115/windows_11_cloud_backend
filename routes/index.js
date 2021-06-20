@@ -10,15 +10,17 @@ var myLogger = function (err , req, res, next) {
 		res.status( err.statusCode ).send( err );
 		next();
 	
-  }
-  
- 
+  } 
 
 
 app.use( "/users" , require("./user.js") );
 
 
+
+
+
 app.use("/" , function(req , res , next ){
+	console.log("i am getting here");
 	var authorization = req.headers.authorization;
 	if( authorization == undefined ){
 		res.status( 401 ).send("token not found");
@@ -39,6 +41,8 @@ app.use("/" , function(req , res , next ){
 		next();
 		
 	}catch( err ){
+		console.log("my erro r is");
+		console.log(err);
 		err.statusCode = 401;
 		next(err);
 		return;
@@ -52,7 +56,8 @@ app.use( "/meals/favs" , require("./favs") );
 app.use( "/meals" , require("./meals.js") );
 app.use( "/categories" , require("./categories.js") );
 app.use( "/orders" , require("./orders") );
-app.use( "/" , (req , res , next)=>{ res.status(200).send("hi , i am Mohamed Adam")} );
+app.use( "/users" , require("./user") );
+app.use( "/" , (req , res , next)=>{ res.status(200).send("you have requested wong page")} );
 app.use(myLogger)
 
 module.exports = app;

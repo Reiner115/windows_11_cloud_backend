@@ -27,7 +27,7 @@ router.get("/categories/:id" ,  function(req , res , next ){
 	limit = parseInt( limit );	
 	categoryId = parseInt( categoryId );
 
-	Meal.getMealsByCategory( categoryId , offset , limit ).
+	Meal.getMealsByCategory( req.user.id , categoryId , offset , limit ).
 	then( data =>{
 		res.send( data );
 	}).catch( next );
@@ -61,7 +61,7 @@ router.get("/offers/" , ( req , res , next )=>{
 
 
 
-	Meal.getOffersByLimits( offset , limit ).
+	Meal.getOffersByLimits( req.user.id , offset , limit ).
 	then( data =>{
 		res.send( data );
 	}).
@@ -149,8 +149,8 @@ router.get("/" , function( req , res , next){
 
 	offset = parseInt( offset );
 	limit = parseInt( limit );	
-
-	Meal.getMeals( offset , limit ).then( result => {
+	var id = req.user.id;
+	Meal.getMeals( id , offset , limit ).then( result => {
 		res.send( result )
 	}).catch(next);
 });
