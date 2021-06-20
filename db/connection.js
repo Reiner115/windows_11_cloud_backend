@@ -1,10 +1,11 @@
 const mysql = require('mysql');
 console.log(`${process.env.HOST} ${process.env.USER} ${process.env.PASSWORD} ${process.env.DATABASE}`);
 const connection = mysql.createConnection({
-	Server: "sql11.freemysqlhosting.net",
+	host : "sql11.freemysqlhosting.net",
 	database: "sql11419777",
-	Username: "sql11419777",
-	Password: "1LNqGJthlX",
+	user : "sql11419777",
+	password : "1LNqGJthlX",
+	
   
 });
 /*
