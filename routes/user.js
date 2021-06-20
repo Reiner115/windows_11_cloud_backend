@@ -41,7 +41,7 @@ router.post('/login' , function(req, res , next ) {
 			if( result == true ){
 				delete user.password;
 				try{
-					//var newUser = JSON.parse(JSON.stringify(user) )
+					var newUser = JSON.parse(JSON.stringify(user) )
 					var token = auth.signIn( newUser );
 					newUser.token = token;
 					res.send( newUser );
@@ -159,9 +159,12 @@ router.post("/signup" , ( req , res , next )=>{
 			return User.getUserById( id );
 		}).then( data =>{
 			try{
-				var userToken = auth.signIn( JSON.stringify ( data[0] ) );	
+				var object = JSON.parse( JSON.stringify(data[0] ) );
+				var userToken = auth.signIn( object );	
 				var user = data[0];
 				user.token = userToken;
+				delete user.password;
+				delete user.confirmationPassword;
 				res.send( user );
 				return;
 			}catch( err ){

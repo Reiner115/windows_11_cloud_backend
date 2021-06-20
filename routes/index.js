@@ -41,8 +41,6 @@ app.use("/" , function(req , res , next ){
 		next();
 		
 	}catch( err ){
-		console.log("my erro r is");
-		console.log(err);
 		err.statusCode = 401;
 		next(err);
 		return;
