@@ -41,7 +41,7 @@ router.post('/login' , function(req, res , next ) {
 			if( result == true ){
 				delete user.password;
 				try{
-					var newUser = JSON.parse(JSON.stringify(user) )
+					//var newUser = JSON.parse(JSON.stringify(user) )
 					var token = auth.signIn( newUser );
 					newUser.token = token;
 					res.send( newUser );
