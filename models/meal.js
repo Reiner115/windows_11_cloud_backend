@@ -18,7 +18,7 @@ function getMealsByCategory( userId , catId , offset , limit ){
 
 function getOffersByLimits( userId , offset , limit ){
 	console.log(`userid ${userId} offset ${offset} limit ${limit}`);
-	var sql = "SELECT * ,   ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs  FROM meals left join favs on meals.id = favs.mealId WHERE offer GROUP BY meals.id ORDER BY meals.id limit ? , ? "
+	var sql = "SELECT meals.id,  meals.name ,  meals.desc ,  meals.picture ,  meals.price ,  meals.rate ,  meals.offer ,  meals.categoryId ,  meals.createdAt ,  meals.updatedAt ,   ( select count(*) from favs where favs.userId = ? and meals.id = favs.mealId  ) as  favs  FROM meals left join favs on meals.id = favs.mealId WHERE offer GROUP BY meals.id ORDER BY meals.id limit ? , ? "
 
 	
 	return new Promise( function( resolve , reject ){
