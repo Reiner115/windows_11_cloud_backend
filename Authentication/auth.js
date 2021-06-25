@@ -6,7 +6,7 @@ const SECRET = "mysecret";
 
 function signIn( user ){
 
-	var token = jwt.sign( user , SECRET  , {algorithm: 'HS256' , expiresIn :  60 *60 });
+	var token = jwt.sign( user , SECRET  , {algorithm: 'HS256' , expiresIn :  60 *60 * 24  });
 
 	return token;
 }
