@@ -1,51 +1,72 @@
-const { ENOENT } = require('constants');
-const express = require('express');
+const logger = require("./util/logger");
+const express = require("express");
 const fs = require("fs");
-const category  = require('./category');
-var jwt = require('jsonwebtoken');
-var crypto = require('crypto');
-var bodyParser = require('body-parser');
-var router = express.Router;
-const auth = require("./Authentication/auth");
-
+var cors = require("cors");
 const app = express();
-app.set( "view engine" , "ejs" );
-const port = 3000;
+const nodemailer = require('nodemailer');
 
 
-app.use( express.json());
-app.use( express.urlencoded());
-var KEY = "MYKEY";
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded());
+app.use("/", require("./routes"));
 
+var http = require("http");
+var https = require("https");
+var privateKey = fs.readFileSync("./localhost.key", "utf8");
+var certificate = fs.readFileSync("./localhost.crt", "utf8");
+var credentials = { key: privateKey, cert: certificate };
+var httpServer = http.createServer(app);
+var httpsServer = https.createServer(credentials, app);
 
-
-
-
-//app.use("/public/",express.static('public'))
-
-
-
-
-//used before for serving static routes
-app.get("/public/images/:imageName" ,async function(req , res){
-	console.log("asked for image");
-	const exists = fs.existsSync( __dirname +  "/public/images/" + req.params.imageName );
-	
-	if( exists ){
-		
-		res.sendFile(  __dirname +  "/public/images/" + req.params.imageName );
-
-		
-	}
-		
-	else
-		res.status( 404 ).send('Not found');	
+httpServer.listen(process.env.WINDOWS_CLOUD_HTTP_PORT || 8000, () => {
+  logger.info("listining http at port  " + (process.env.WINDOWS_CLOUD_HTTP_PORT ));
+});
+httpsServer.listen(process.env.WINDOWS_CLOUD_HTTPS_PORT|| 9000, () => {
+  logger.info("listining HTTPS at port  " + (process.env.WINDOWS_CLOUD_HTTPS_PORT));
 });
 
+const os = require('os');
+const platform = os.platform();
+logger.info("OS type :: "+platform);
 
+/*
+const transporter = nodemailer.createTransport({
+  host: 'mail.mohamed-adam.com', // Replace with your SMTP server hostname
+  port: 465, // Replace with your SMTP port
+  secure: true, // Set to true if your SMTP server requires a secure connection (e.g., port 465)
+  auth: {
+    user: 'dev@mohamed-adam.com', // Your email address
+    pass: 'Mohamed199765432', // Your email password
+  },
+  
+});
+const htmlContent = `
+  <html>
+  <head>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+      }
+      h1 {
+        color: #333;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to My Email</h1>
+    <p>This is a styled email content.</p>
+  </body>
+  </html>
+`;
+const mailOptions = {
+  from: 'Mohamed Adam',
+  to: "mohamedadamza@gmail.com",
+  subject: 'Activate Your Account',
+  text: `Hi there , i am Mohamed Adam , a software developer`,
+  htmlContent : htmlContent
+};
 
-//app.use( "/" , (req , res , next)=>{ res.status(200).send("hiaaaaaaaaaaaa , i am Mohamed Adam")} );
-app.use( "/" , require("./routes") );
-
-
-	app.listen( process.env.PORT || port , ()=>{ console.log('listining at port  ' +( process.env.PORT || port ) ); });
+ transporter.sendMail(mailOptions).then(value=>console.log(value)).catch(err=>console.log(err));
+ */

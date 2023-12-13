@@ -1,6 +1,5 @@
 var express = require("express");
 var app = express();
-const auth = require("../Authentication/auth")
 
 var myLogger = function (err , req, res, next) {
 		
@@ -12,50 +11,60 @@ var myLogger = function (err , req, res, next) {
 	
   } 
 
+app.use("/e15/precheck" , function(req , res , next){
 
-app.use( "/users" , require("./user.js") );
+	console.log(req.body);
+	console.log(req.headers,"\n\n\n\n\n\n\n\n");
 
-
-
-
-
-app.use("/" , function(req , res , next ){
-	console.log("i am getting here");
-	var authorization = req.headers.authorization;
-	if( authorization == undefined ){
-		res.status( 401 ).send("token not found");
-		return;
-	}
-	var token;
-	if( authorization.split(" ")[0] == "Bearer" ){
-		 token =  authorization.split(" ")[1];	
-	}else  {
-		token = authorization;
-	}	
+	const response = {
+		response_code:200,
+		//additonal fields
+		total_amount: 100,
+		status: 1,
+		amount_due: 111,
+		currency_code: "SDG",
+		expiry: "2020-01-01",
+		payer_name: "EBS",
+		ref_id: 5555,
+		unit_name: "سداد"
 	
-	try{
-	
-		var user = auth.verifyUser( token );
-		
-		req.user = user;
-		next();
-		
-	}catch( err ){
-		err.statusCode = 401;
-		next(err);
-		return;
-	}
+	};
+	res.json(response).status(200).send();
 
-	
 });
 
+app.use("/e15/provision" , function(req , res , next){
 
-app.use( "/meals/favs" , require("./favs") );
-app.use( "/meals" , require("./meals.js") );
-app.use( "/categories" , require("./categories.js") );
-app.use( "/orders" , require("./orders") );
-app.use( "/users" , require("./user") );
-app.use( "/" , (req , res , next)=>{ res.status(200).send("you have requested wong page")} );
+	console.log(req.body);
+	console.log(req.headers,"\n\n\n\n\n\n\n");
+
+	const response = {
+		response_code:200,
+		response_message : "is this message gonna be displayed?",
+		verifier: "e400d79960d7518286354954e537e1f43e12d93ea8ffc9c1dcceea090438ccee",
+		uuid: "uuid",
+		ref_id: 5555,
+		amount_due: 100,
+
+	
+	};
+	res.json(response).status(200).send();
+
+});
+//no authrization needed to access these routes
+
+app.use( "/user" , require("./userRoute") );
+app.use("/public" , require("./accessFile"));
+//app.use("/" , (req,res)=> {return res.status(500).json({responseMessage : "SOME ERROR 123"}).send()});
+
+//authenticate user
+app.use("/" , require("./authenticate"))
+//authenticated users only acess these pathes
+app.use( "/upload" , require("./upload") );
+app.use( "/state" , require("./stateRoute") );
+app.use("/actions" , require("./actions"));
+
+app.use( "/" , (req , res , next)=>res.status(200).send("you have requested wrong page"));
 app.use(myLogger)
 
 module.exports = app;
